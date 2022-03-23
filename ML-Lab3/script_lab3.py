@@ -194,8 +194,20 @@ def training_elastic(x: np.ndarray,
     """
     # TODO: Change the code below and implement an algorithm to solve the linear regression with elastic net regularizer
     #  Hint: Try to reformulate the problem to a lasso.
-    
-    return np.zeros((x.shape[1], 1))
+    dim = x.shape[1]
+    w = np.random.RandomState(r_seed).randn(dim, 1)
+    for i in range(iteration) :
+        for j in range(dim) :
+            x_gamma2 = np.ones((dim, dim)) * np.sqrt(gamma2)
+            X = np.r_[x, x_gamma2]
+            Y = np.r_[y, np.zeros((dim, 1))]
+            X_d = X[:,j].reshape(-1,1)
+            thres = gamma1 / (np.sum(X_d ** 2))
+            X_c = np.delete(X.copy(),j,axis=1)
+            W_c = np.delete(w.copy(),j,axis=0)
+            tmp = (X_d.T @ (Y - X_c @ W_c)) / (np.sum(X_d ** 2))
+            w[j] = soft_thresholding(tmp, thres)
+    return w
 
 
 # Task 5: Implement the iteratively reweighted least square (IRLS) to solve min_w ||y - Xw||_1
@@ -231,28 +243,27 @@ if __name__ == '__main__':
     data1 = linear_data_simulator(prior='Gauss', noise='Gauss')
     data2 = linear_data_simulator(prior='Laplace', noise='Gauss')
     data3 = linear_data_simulator(prior='Gauss', noise='Laplace')
-    # print(data1['train'][0].shape)
     w1 = training(data1['train'][0], data1['train'][1], gamma=1)
     w2 = training_sgd(data1['train'][0], data1['train'][1], gamma=1)
     w3 = training_lasso(data2['train'][0], data2['train'][1], gamma=1)
-    # w4 = training_elastic(data2['train'][0], data2['train'][1], gamma1=1, gamma2=1)
+    w4 = training_elastic(data2['train'][0], data2['train'][1], gamma1=1, gamma2=1)
     w5 = training_irls(data3['train'][0], data3['train'][1])
 
     mse_w1 = mse(data1['real'], w1)
     mse_w2 = mse(data1['real'], w2)
     mse_w3 = mse(data2['real'], w3)
-    # mse_w4 = mse(data2['real'], w4)
+    mse_w4 = mse(data2['real'], w4)
     mse_w5 = mse(data3['real'], w5)
 
     mse_y1 = testing(data1['test'][0], data1['test'][1], w1)
     mse_y2 = testing(data1['test'][0], data1['test'][1], w2)
     mse_y3 = testing(data2['test'][0], data2['test'][1], w3)
-    # mse_y4 = testing(data2['test'][0], data2['test'][1], w4)
+    mse_y4 = testing(data2['test'][0], data2['test'][1], w4)
     mse_y5 = testing(data3['test'][0], data3['test'][1], w5)
 
     print('Ridge regression, mse-w={:.4f}, mse-y={:.4f}'.format(mse_w1, mse_y1))
     print('Ridge regression (SGD), mse-w={:.4f}, mse-y={:.4f}'.format(mse_w2, mse_y2))
     print('Lasso regularizer, mse-w={:.4f}, mse-y={:.4f}'.format(mse_w3, mse_y3))
-    # print('Elastic Net regularizer, mse-w={:.4f}, mse-y={:.4f}'.format(mse_w4, mse_y4))
+    print('Elastic Net regularizer, mse-w={:.4f}, mse-y={:.4f}'.format(mse_w4, mse_y4))
     print('IRLS, mse-w={:.4f}, mse-y={:.4f}'.format(mse_w5, mse_y5))
 
