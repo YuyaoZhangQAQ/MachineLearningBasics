@@ -164,11 +164,9 @@ def training_lasso(x: np.ndarray,
     for i in range(iteration) :
         for j in range(0, dim) :
             x_d = x[:,j].reshape(-1,1) # attention: ndarray with size of (50,) is not a vector,so apply this function .reshape(-1,1) to convert it to a column vector
-            thres = gamma / (np.sum(x_d ** 2))
-            x_c = np.delete(x.copy(),j,axis=1)
-            w_c = np.delete(w.copy(),j,axis=0)
-            tmp = (x_d.T @ (y - x_c @ w_c)) / (np.sum(x_d ** 2))
-            w[j] = soft_thresholding(tmp, thres)
+            x_c = np.delete(x,j,axis=1)
+            w_c = np.delete(w,j,axis=0)
+            w[j] = soft_thresholding((x_d.T @ (y - x_c @ w_c)) / (np.sum(x_d ** 2)), gamma / (np.sum(x_d ** 2)))
     return w
 
 # Task 4: Implement the training function of the linear regression with elastic net regression
@@ -196,17 +194,16 @@ def training_elastic(x: np.ndarray,
     #  Hint: Try to reformulate the problem to a lasso.
     dim = x.shape[1]
     w = np.random.RandomState(r_seed).randn(dim, 1)
+    x_gamma2 = np.ones((dim, dim)) * np.sqrt(gamma2)
+    y_zeros = np.zeros((dim, 1))
     for i in range(iteration) :
         for j in range(dim) :
-            x_gamma2 = np.ones((dim, dim)) * np.sqrt(gamma2)
             X = np.r_[x, x_gamma2]
-            Y = np.r_[y, np.zeros((dim, 1))]
+            Y = np.r_[y, y_zeros]
             X_d = X[:,j].reshape(-1,1)
-            thres = gamma1 / (np.sum(X_d ** 2))
-            X_c = np.delete(X.copy(),j,axis=1)
-            W_c = np.delete(w.copy(),j,axis=0)
-            tmp = (X_d.T @ (Y - X_c @ W_c)) / (np.sum(X_d ** 2))
-            w[j] = soft_thresholding(tmp, thres)
+            X_c = np.delete(X,j,axis=1)
+            W_c = np.delete(w,j,axis=0)
+            w[j] = soft_thresholding((X_d.T @ (Y - X_c @ W_c)) / (np.sum(X_d ** 2)), gamma1 / (np.sum(X_d ** 2)))
     return w
 
 
@@ -266,4 +263,3 @@ if __name__ == '__main__':
     print('Lasso regularizer, mse-w={:.4f}, mse-y={:.4f}'.format(mse_w3, mse_y3))
     print('Elastic Net regularizer, mse-w={:.4f}, mse-y={:.4f}'.format(mse_w4, mse_y4))
     print('IRLS, mse-w={:.4f}, mse-y={:.4f}'.format(mse_w5, mse_y5))
-
