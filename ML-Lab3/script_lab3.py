@@ -97,7 +97,7 @@ def training_sgd(x: np.ndarray,
                  gamma: float,
                  epoch: int = 10,
                  batch_size: int = 10,
-                 lr: float = 1e-4,
+                 lr: float = 5e-2,
                  r_seed: int = 1) -> np.ndarray:
     """
     The stochastic gradient descent method of ridge regression.
@@ -117,11 +117,15 @@ def training_sgd(x: np.ndarray,
     # TODO: Given the initialization above, implement your own SGD algorithm for ridge regression
     np.random.seed(r_seed)
     for i in range(epoch) :
-        rand_index = np.random.randint(0, x.shape[0], batch_size)
-        x_s = x[rand_index]
-        y_s = y[rand_index]
-        grad = 2 * x_s.T @ (x_s @ w - y_s) + 2 * gamma * w
-        w = w - lr * grad
+        random_index = [i for i in range(x.shape[0])]
+        np.random.RandomState(r_seed).shuffle(random_index)
+        x = x[random_index]
+        y = y[random_index]
+        for batch in range(int(x.shape[0] / batch_size)) :
+            x_batch = x[batch * 10: batch * 10 + batch_size]
+            y_batch = y[batch * 10: batch * 10 + batch_size]
+            avg_grad = (2 * x_batch.T @ (x_batch @ w - y_batch) + 2 * gamma * w) / batch_size
+        w = w - lr * avg_grad
     return w
 
 
