@@ -9,4 +9,4 @@ ML Basics courses in Gaoling shool of Artificial Intelligence in RUC, teached by
 
 内容和质量都属于比较硬核的那种
 
-再说一遍！许老师！神！
+希望菜菜可以帮助到你们hhh
