@@ -156,11 +156,11 @@ def laplacian_eigenmaps(xs: np.ndarray, k: int = None, dim: int = 2,
     return res
 
 data = simulate_3d_manifold()
-# visualization_3d_pts(data['3d'], prefix='data')
-# visualization_2d_pts(data['2d'], prefix='data')
-# for k in [3, 5, 10, 25, 50, 100, 200]:
-#     z1 = locally_linear_embedding(xs=data['3d'], k=k)
-#     visualization_2d_pts(z1, prefix='LLE_{}'.format(k))
+visualization_3d_pts(data['3d'], prefix='data')
+visualization_2d_pts(data['2d'], prefix='data')
+for k in [3, 5, 10, 25, 50, 100, 200]:
+    z1 = locally_linear_embedding(xs=data['3d'], k=k)
+    visualization_2d_pts(z1, prefix='LLE_{}'.format(k))
 
 for k in [3, 5, 10, 25, 50, 100, 200, None]:
     z2 = laplacian_eigenmaps(xs=data['3d'], k=k)
