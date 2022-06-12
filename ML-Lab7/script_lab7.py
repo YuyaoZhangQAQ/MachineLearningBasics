@@ -84,7 +84,7 @@ def m_step(xs: np.ndarray, ys: np.ndarray,
     """
     # TODO: Change the code and implement the m-step
     M, D = ys.shape
-    Y = np.concatenate((ys, np.ones((M, 1))), axis = 1)  # expand Y   (M,D+1)
+    Y = np.concatenate((ys, np.ones((M, 1))), axis = 1)
     Y_train = Y.T @ np.diag(np.sum(responsibility, axis = 0)) @ Y
     affine = xs.T @ responsibility @ Y @ np.linalg.inv(Y_train)
     translation = affine[:, -1].reshape(1, -1)
